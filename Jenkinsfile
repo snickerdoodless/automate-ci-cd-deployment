@@ -27,8 +27,9 @@ pipeline {
 
         stage('Prepare Build Context') {
             steps {
-                sh 'cp -r Projects/flask/fastfood-flaskapp/flask-fastfood-app/* Projects/ci-cd/automate-ci-cd-deployment/app/'
-                sh 'cp -r Projects/flask/fastfood-flaskapp/flask-fastfood-app/feane.sql Projects/ci-cd/automate-ci-cd-deployment/db/'
+                // absolute path to avoid error
+                sh 'cp -r /opt/jenkins-slave/workspace/automate-deployment/Projects/flask/fastfood-flaskapp/flask-fastfood-app/* /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/automate-ci-cd-deployment/app/'
+                sh 'cp -r /opt/jenkins-slave/workspace/automate-deployment/Projects/flask/fastfood-flaskapp/flask-fastfood-app/feane.sql /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/automate-ci-cd-deployment/db/'
             }
         }
 
