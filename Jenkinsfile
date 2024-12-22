@@ -8,7 +8,9 @@ pipeline {
     
     stages {
         stage('Initialize ID') {
-            sh 'whoami'
+            steps {
+                sh 'whoami'
+            }
         }
         
         stage('Cloning Projects') {
