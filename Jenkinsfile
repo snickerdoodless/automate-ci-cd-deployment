@@ -5,22 +5,21 @@ pipeline {
         APP_IMAGE = 'rall4/flaskapp'
         MYSQL_IMAGE = 'rall4/mysql'
     }
-    
+
     stages {
         stage('Initialize ID') {
             steps {  
                 sh 'whoami && groups'
-                sh 'sudo usermod -aG docker ubuntu'
             }
         }
-        
+
         stage('Cloning Projects') {
             steps {
-                dir('fastfood-flaskapp') {
+                dir('Projects') {
                     git branch: 'main', url: 'https://github.com/snickerdoodless/fastfood-flaskapp'
                 }
 
-                dir('automate-ci-cd-deployment') {
+                dir('Projects') {
                     git branch: 'main', url: 'https://github.com/snickerdoodless/automate-ci-cd-deployment.git'
                 }
             }
@@ -29,8 +28,8 @@ pipeline {
         stage('Building Flask App Image') {
             steps {
                 script {
-                    dir('automate-ci-cd-deployment') {
-                        docker.build(APP_IMAGE, '../fastfood-flaskapp/flask-fastfood-app:.') 
+                    dir('Projects/automate-ci-cd-deployment/app') {
+                        docker.build(APP_IMAGE, "../fastfood-flaskapp/flask-fastfood-app:./")
                     }
                 }
             }
@@ -39,8 +38,8 @@ pipeline {
         stage('Building MySQL Image') {
             steps {
                 script {
-                    dir('automate-ci-cd-deployment') {
-                        docker.build(MYSQL_IMAGE, '../fastfood-flaskapp/flask-fastfood-app:./') 
+                    dir('Projects/automate-ci-cd-deployment/mysql') {
+                        docker.build(MYSQL_IMAGE, '.')
                     }
                 }
             }
@@ -52,8 +51,8 @@ pipeline {
                     docker.tag(APP_IMAGE, "${APP_IMAGE}:latest")
                     docker.tag(APP_IMAGE, "${APP_IMAGE}:${env.BUILD_TIMESTAMP}")
                     docker.tag(MYSQL_IMAGE, "${MYSQL_IMAGE}:latest")
-                    docker.tag(MYSQL_IMAGE, "${MYSQL_IMAGE}:${env.BUILD_TIMESTAMP}") 
-
+                    docker.tag(MYSQL_IMAGE, "${MYSQL_IMAGE}:${env.BUILD_TIMESTAMP}")
+                    
                     echo "Tagged APP_IMAGE: ${APP_IMAGE}:${env.BUILD_TIMESTAMP}"
                     echo "Tagged MYSQL_IMAGE: ${MYSQL_IMAGE}:${env.BUILD_TIMESTAMP}"
                 }
