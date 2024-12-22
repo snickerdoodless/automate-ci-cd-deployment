@@ -43,7 +43,7 @@ pipeline {
         stage('Building Flask App Image') {
             steps {
                 script {
-                    dir('Projects/automate-ci-cd-deployment/app') {
+                    dir('Projects/ci-cd/app') {
                         docker.build(APP_IMAGE, '.')
                     }
                 }
@@ -53,7 +53,7 @@ pipeline {
         stage('Building MySQL Image') {
             steps {
                 script {
-                    dir('Projects/automate-ci-cd-deployment/db') {
+                    dir('Projects/ci-cd/db') {
                         docker.build(MYSQL_IMAGE, '.')
                     }
                 }
