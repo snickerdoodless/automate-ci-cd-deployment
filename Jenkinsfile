@@ -9,7 +9,8 @@ pipeline {
     stages {
         stage('Initialize ID') {
             steps {  
-                sh 'whoami'
+                sh 'whoami && groups'
+                sh 'sudo usermod -aG docker ubuntu'
             }
         }
         
