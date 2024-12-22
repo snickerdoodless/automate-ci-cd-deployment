@@ -8,7 +8,7 @@ pipeline {
     
     stages {
         stage('Initialize ID') {
-            steps {
+            steps {  
                 sh 'whoami'
             }
         }
@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     dir('automate-ci-cd-deployment') {
-                        docker.build(APP_IMAGE, '../fastfood-flaskapp/flask-fastfood-app:./')
+                        docker.build(APP_IMAGE, '../fastfood-flaskapp/flask-fastfood-app:.') 
                     }
                 }
             }
@@ -51,10 +51,10 @@ pipeline {
                     docker.tag(APP_IMAGE, "${APP_IMAGE}:latest")
                     docker.tag(APP_IMAGE, "${APP_IMAGE}:${env.BUILD_TIMESTAMP}")
                     docker.tag(MYSQL_IMAGE, "${MYSQL_IMAGE}:latest")
-                    docker.tag(MYSQL_IMAGE, "${APP_IMAGE}:${env.BUILD_TIMESTAMP}")
-                    
-                    echo "Tagged APP_IMAGE: ${APP_IMAGE}:${BUILD_TIMESTAMP}"
-                    echo "Tagged MYSQL_IMAGE: ${MYSQL_IMAGE}:${BUILD_TIMESTAMP}"
+                    docker.tag(MYSQL_IMAGE, "${MYSQL_IMAGE}:${env.BUILD_TIMESTAMP}") 
+
+                    echo "Tagged APP_IMAGE: ${APP_IMAGE}:${env.BUILD_TIMESTAMP}"
+                    echo "Tagged MYSQL_IMAGE: ${MYSQL_IMAGE}:${env.BUILD_TIMESTAMP}"
                 }
             }
         }
