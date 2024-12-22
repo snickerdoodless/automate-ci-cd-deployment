@@ -15,13 +15,13 @@ pipeline {
 
         stage('Cloning Projects') {
             steps {
-                dir('Projects') {
+                dir('Projects/flask') {
                     git branch: 'main', url: 'https://github.com/snickerdoodless/fastfood-flaskapp'
                 }
 
-                dir('Projects') {
+                dir('Projects/ci-cd') {
                     git branch: 'pipeline', url: 'https://github.com/snickerdoodless/automate-ci-cd-deployment.git'
-                }
+                }   
             }
         }
 
