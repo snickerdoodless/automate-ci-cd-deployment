@@ -27,18 +27,17 @@ pipeline {
 
         stage('Prepare Build Context') {
             steps {
-                // use absolute path to avoid error
-                // debugging: 
+                // Use absolute path to avoid errors
+                // Debugging: 
                 sh 'ls -l /opt/jenkins-slave/workspace/automate-deployment/Projects/flask/flask-fastfood-app/'
                 sh 'ls -l /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/app/'
                 sh 'ls -l /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/db/'
 
-                // executing build context
+                // Executing build context
                 sh 'cp -r /opt/jenkins-slave/workspace/automate-deployment/Projects/flask/flask-fastfood-app/* /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/app/'
                 sh 'cp /opt/jenkins-slave/workspace/automate-deployment/Projects/flask/flask-fastfood-app/feane.sql /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/db/'
             }
         }
-
 
         stage('Building Flask App Image') {
             steps {
@@ -60,16 +59,40 @@ pipeline {
             }
         }
 
-        stage('Tagging Images') {
+        stage('Tagging & Pushing to Registry') {
             steps {
                 script {
-                    docker.tag(APP_IMAGE, "${APP_IMAGE}:latest")
-                    docker.tag(APP_IMAGE, "${APP_IMAGE}:${env.BUILD_TIMESTAMP}")
-                    docker.tag(MYSQL_IMAGE, "${MYSQL_IMAGE}:latest")
-                    docker.tag(MYSQL_IMAGE, "${MYSQL_IMAGE}:${env.BUILD_TIMESTAMP}")
-                    
-                    echo "Tagged APP_IMAGE: ${APP_IMAGE}:${env.BUILD_TIMESTAMP}"
-                    echo "Tagged MYSQL_IMAGE: ${MYSQL_IMAGE}:${env.BUILD_TIMESTAMP}"
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', 
+                                                     usernameVariable: 'DOCKER_USER', 
+                                                     passwordVariable: 'DOCKER_PASS')]) {
+                        // Docker login
+                        sh """
+                            echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
+                        """
+
+                        // Push Flask App Image
+                        def appImage = docker.image("${APP_IMAGE}")
+                        appImage.push("latest")
+                        
+                        def appTagTimestamp = env.BUILD_TIMESTAMP ?: "manual"
+                        appImage.push(appTagTimestamp)
+                        echo "Successfully pushed Flask App image with tags: latest and ${appTagTimestamp}"
+
+                        // Push MySQL Image
+                        def mysqlImage = docker.image("${MYSQL_IMAGE}")
+                        mysqlImage.push("latest")
+
+                        def mysqlTagTimestamp = env.BUILD_TIMESTAMP ?: "manual"
+                        mysqlImage.push(mysqlTagTimestamp)
+                        echo "Successfully pushed MySQL image with tags: latest and ${mysqlTagTimestamp}"
+                    }
+                }
+
+                post {
+                    always {
+                        // Ensure logout after the job
+                        sh "docker logout"
+                    }
                 }
             }
         }
