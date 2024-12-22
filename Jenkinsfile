@@ -27,8 +27,8 @@ pipeline {
 
         stage('Prepare Build Context') {
             steps {
-                sh 'cp -r Projects/fastfood-flaskapp/flask-fastfood-app/* Projects/automate-ci-cd-deployment/app/'
-                sh 'cp -r Projects/fastfood-flaskapp/flask-fastfood-app/feane.sql Projects/automate-ci-cd-deployment/db/'
+                sh 'cp -r Projects/flask/fastfood-flaskapp/flask-fastfood-app/* Projects/ci-cd/automate-ci-cd-deployment/app/'
+                sh 'cp -r Projects/flask/fastfood-flaskapp/flask-fastfood-app/feane.sql Projects/ci-cd/automate-ci-cd-deployment/db/'
             }
         }
 
