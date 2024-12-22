@@ -5,8 +5,12 @@ pipeline {
         APP_IMAGE = 'rall4/flaskapp'
         MYSQL_IMAGE = 'rall4/mysql'
     }
-
+    
     stages {
+        stage('Initialize ID') {
+            sh 'whoami'
+        }
+        
         stage('Cloning Projects') {
             steps {
                 dir('fastfood-flaskapp') {
