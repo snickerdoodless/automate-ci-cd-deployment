@@ -9,6 +9,7 @@ pipeline {
     stages {
         stage('Initialize ID') {
             steps {  
+                //debug
                 sh 'whoami && groups'
             }
         }
@@ -27,11 +28,17 @@ pipeline {
 
         stage('Prepare Build Context') {
             steps {
-                // absolute path to avoid error
-                sh 'cp -r /opt/jenkins-slave/workspace/automate-deployment/Projects/flask/fastfood-flaskapp/flask-fastfood-app/* /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/automate-ci-cd-deployment/app/'
-                sh 'cp -r /opt/jenkins-slave/workspace/automate-deployment/Projects/flask/fastfood-flaskapp/flask-fastfood-app/feane.sql /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/automate-ci-cd-deployment/db/'
+                // use absolute path to avoid error
+                // debugging: 
+                sh 'ls -l /opt/jenkins-slave/workspace/automate-deployment/Projects/flask/flask-fastfood-app/'
+                sh 'ls -l /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/automate-ci-cd-deployment/app/'
+
+                // executing build context
+                sh 'cp -r /opt/jenkins-slave/workspace/automate-deployment/Projects/flask/flask-fastfood-app/* /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/automate-ci-cd-deployment/app/'
+                sh 'cp /opt/jenkins-slave/workspace/automate-deployment/Projects/flask/flask-fastfood-app/feane.sql /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/automate-ci-cd-deployment/db/'
             }
         }
+
 
         stage('Building Flask App Image') {
             steps {
