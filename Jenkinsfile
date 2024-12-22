@@ -63,28 +63,33 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', 
-                                                     usernameVariable: 'DOCKER_USER', 
-                                                     passwordVariable: 'DOCKER_PASS')]) {
-                        // Docker login
+                                                    usernameVariable: 'DOCKER_USER', 
+                                                    passwordVariable: 'DOCKER_PASS')]) {
                         sh """
                             echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
                         """
 
-                        // Push Flask App Image
                         def appImage = docker.image("${APP_IMAGE}")
-                        appImage.push("latest")
-                        
+                        appImage.tag("rall4/feane-flask:flaskapp-latest")
+                        appImage.push("flaskapp-latest")
+
+            
                         def appTagTimestamp = env.BUILD_TIMESTAMP ?: "manual"
-                        appImage.push(appTagTimestamp)
-                        echo "Successfully pushed Flask App image with tags: latest and ${appTagTimestamp}"
+                        appImage.tag("rall4/feane-flask:flaskapp-${appTagTimestamp}")
+                        appImage.push("flaskapp-${appTagTimestamp}")
 
-                        // Push MySQL Image
+                        echo "Successfully pushed Flask App image with tags: flaskapp-latest and flaskapp-${appTagTimestamp}"
+
+    
                         def mysqlImage = docker.image("${MYSQL_IMAGE}")
-                        mysqlImage.push("latest")
-
+                        mysqlImage.tag("rall4/feane-flask:mysql-latest")
+                        mysqlImage.push("mysql-latest")
+                        
                         def mysqlTagTimestamp = env.BUILD_TIMESTAMP ?: "manual"
-                        mysqlImage.push(mysqlTagTimestamp)
-                        echo "Successfully pushed MySQL image with tags: latest and ${mysqlTagTimestamp}"
+                        mysqlImage.tag("rall4/feane-flask:mysql-${mysqlTagTimestamp}")
+                        mysqlImage.push("mysql-${mysqlTagTimestamp}")
+
+                        echo "Successfully pushed MySQL image with tags: mysql-latest and mysql-${mysqlTagTimestamp}"
                     }
                 }
 
@@ -96,5 +101,6 @@ pipeline {
                 }
             }
         }
+
     }
 }
