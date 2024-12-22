@@ -70,34 +70,32 @@ pipeline {
                         """
 
                         def appImage = docker.image("${APP_IMAGE}")
-                        appImage.tag("rall4/feane-flask:flaskapp-latest")
+                        appImage.tag("flaskapp-latest") 
                         appImage.push("flaskapp-latest")
 
-            
                         def appTagTimestamp = env.BUILD_TIMESTAMP ?: "manual"
-                        appImage.tag("rall4/feane-flask:flaskapp-${appTagTimestamp}")
+                        appImage.tag("flaskapp-${appTagTimestamp}") 
                         appImage.push("flaskapp-${appTagTimestamp}")
 
                         echo "Successfully pushed Flask App image with tags: flaskapp-latest and flaskapp-${appTagTimestamp}"
 
-    
                         def mysqlImage = docker.image("${MYSQL_IMAGE}")
-                        mysqlImage.tag("rall4/feane-flask:mysql-latest")
+                        mysqlImage.tag("mysql-latest") 
                         mysqlImage.push("mysql-latest")
-                        
+
                         def mysqlTagTimestamp = env.BUILD_TIMESTAMP ?: "manual"
-                        mysqlImage.tag("rall4/feane-flask:mysql-${mysqlTagTimestamp}")
+                        mysqlImage.tag("mysql-${mysqlTagTimestamp}")
                         mysqlImage.push("mysql-${mysqlTagTimestamp}")
 
                         echo "Successfully pushed MySQL image with tags: mysql-latest and mysql-${mysqlTagTimestamp}"
                     }
                 }
+            }
 
-                post {
-                    always {
-                        // Ensure logout after the job
-                        sh "docker logout"
-                    }
+            post {
+                always {
+                    // Ensure logout after the job
+                    sh "docker logout"
                 }
             }
         }
