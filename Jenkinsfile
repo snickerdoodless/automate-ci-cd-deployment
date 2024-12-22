@@ -29,7 +29,7 @@ pipeline {
             steps {
                 script {
                     dir('Projects/automate-ci-cd-deployment/app') {
-                        docker.build(APP_IMAGE, "../fastfood-flaskapp/flask-fastfood-app:./")
+                        docker.build(APP_IMAGE, "../../fastfood-flaskapp/flask-fastfood-app:./")
                     }
                 }
             }
