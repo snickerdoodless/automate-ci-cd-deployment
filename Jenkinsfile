@@ -20,8 +20,15 @@ pipeline {
                 }
 
                 dir('Projects') {
-                    git branch: 'main', url: 'https://github.com/snickerdoodless/automate-ci-cd-deployment.git'
+                    git branch: 'pipeline', url: 'https://github.com/snickerdoodless/automate-ci-cd-deployment.git'
                 }
+            }
+        }
+
+        stage('Prepare Build Context') {
+            steps {
+                sh 'cp -r Projects/fastfood-flaskapp/flask-fastfood-app/* Projects/automate-ci-cd-deployment/app/'
+                sh 'cp -r Projects/fastfood-flaskapp/flask-fastfood-app/feane.sql Projects/automate-ci-cd-deployment/db/'
             }
         }
 
@@ -29,7 +36,7 @@ pipeline {
             steps {
                 script {
                     dir('Projects/automate-ci-cd-deployment/app') {
-                        docker.build(APP_IMAGE, "../../fastfood-flaskapp/flask-fastfood-app:./")
+                        docker.build(APP_IMAGE, '.')
                     }
                 }
             }
@@ -38,7 +45,7 @@ pipeline {
         stage('Building MySQL Image') {
             steps {
                 script {
-                    dir('Projects/automate-ci-cd-deployment/mysql') {
+                    dir('Projects/automate-ci-cd-deployment/db') {
                         docker.build(MYSQL_IMAGE, '.')
                     }
                 }
