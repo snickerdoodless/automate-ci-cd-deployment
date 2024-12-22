@@ -8,7 +8,8 @@ pipeline {
 
     stages {
         stage('Initialize ID') {
-            steps {  
+            steps {
+                //debug
                 sh 'whoami && groups'
             }
         }
@@ -63,10 +64,11 @@ pipeline {
         stage('Tagging Images') {
             steps {
                 script {
-                    docker.tag(APP_IMAGE, "${APP_IMAGE}:latest")
-                    docker.tag(APP_IMAGE, "${APP_IMAGE}:${env.BUILD_TIMESTAMP}")
-                    docker.tag(MYSQL_IMAGE, "${MYSQL_IMAGE}:latest")
-                    docker.tag(MYSQL_IMAGE, "${MYSQL_IMAGE}:${env.BUILD_TIMESTAMP}")
+                    // using docker.tag will raise security sandbox restrictions so i'll use shell instead
+                    sh "docker tag ${APP_IMAGE} ${APP_IMAGE}:latest"
+                    sh "docker tag ${APP_IMAGE} ${APP_IMAGE}:${env.BUILD_TIMESTAMP}"
+                    sh "docker tag ${MYSQL_IMAGE} ${MYSQL_IMAGE}:latest"
+                    sh "docker tag ${MYSQL_IMAGE} ${MYSQL_IMAGE}:${env.BUILD_TIMESTAMP}"
                     
                     echo "Tagged APP_IMAGE: ${APP_IMAGE}:${env.BUILD_TIMESTAMP}"
                     echo "Tagged MYSQL_IMAGE: ${MYSQL_IMAGE}:${env.BUILD_TIMESTAMP}"
