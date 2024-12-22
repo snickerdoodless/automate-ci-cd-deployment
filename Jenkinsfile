@@ -69,6 +69,12 @@ pipeline {
                             echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
                         """
 
+                         // Reformat BUILD_TIMESTAMP
+                        def sanitizedTimestamp = (env.BUILD_TIMESTAMP ?: "manual")
+                            .replaceAll(' ', '_') // Replace space with underscore
+                            .replaceAll(':', '-')  // Remove colons
+                            .replaceAll('[^a-zA-Z0-9_.-]', '') // Remove invalid characters
+
                         def appImage = docker.image("${APP_IMAGE}")
                         appImage.tag("flaskapp-latest") 
                         appImage.push("flaskapp-latest")
