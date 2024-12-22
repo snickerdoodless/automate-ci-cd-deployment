@@ -30,7 +30,8 @@ pipeline {
                 // use absolute path to avoid error
                 // debugging: 
                 sh 'ls -l /opt/jenkins-slave/workspace/automate-deployment/Projects/flask/flask-fastfood-app/'
-                sh 'ls -l /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/automate-ci-cd-deployment/app/'
+                sh 'ls -l /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/app/'
+                sh 'ls -l /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/db/'
 
                 // executing build context
                 sh 'cp -r /opt/jenkins-slave/workspace/automate-deployment/Projects/flask/flask-fastfood-app/* /opt/jenkins-slave/workspace/automate-deployment/Projects/ci-cd/app/'
