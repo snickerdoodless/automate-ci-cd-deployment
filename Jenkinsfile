@@ -59,7 +59,7 @@ pipeline {
             }
         }
 
-        stage('Tagging & Pushing to Registry') {
+       stage('Tagging & Pushing to Registry') {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', 
@@ -69,37 +69,39 @@ pipeline {
                             echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
                         """
 
-                        echo "Pushing Flask App Image to rall4/myflaskapp..."
                         def appImage = docker.image("${APP_IMAGE}")
                         appImage.tag("rall4/myflaskapp:flaskapp-latest")
                         appImage.push("flaskapp-latest")
 
-                        def appTagTimestamp = env.BUILD_TIMESTAMP ?: "manual"
+                        def appTagTimestamp = (env.BUILD_TIMESTAMP ?: "manual")
+                            .replaceAll(' ', '_')
+                            .replaceAll(':', '-')
+                            .replaceAll('[^a-zA-Z0-9_.-]', '')
                         appImage.tag("rall4/myflaskapp:flaskapp-${appTagTimestamp}")
                         appImage.push("flaskapp-${appTagTimestamp}")
 
                         echo "Successfully pushed Flask App image with tags: flaskapp-latest and flaskapp-${appTagTimestamp}"
 
-                        echo "Pushing MySQL Image to rall4/myflaskapp..."
                         def mysqlImage = docker.image("${MYSQL_IMAGE}")
                         mysqlImage.tag("rall4/myflaskapp:mysql-latest")
                         mysqlImage.push("mysql-latest")
 
-                        def mysqlTagTimestamp = env.BUILD_TIMESTAMP ?: "manual"
+                        def mysqlTagTimestamp = appTagTimestamp // Reuse the same sanitized timestamp
                         mysqlImage.tag("rall4/myflaskapp:mysql-${mysqlTagTimestamp}")
                         mysqlImage.push("mysql-${mysqlTagTimestamp}")
 
                         echo "Successfully pushed MySQL image with tags: mysql-latest and mysql-${mysqlTagTimestamp}"
                     }
                 }
+            }
 
-                post {
-                    always {
-                        // Ensure logout after the job
-                        sh "docker logout"
-                    }
+            post {
+                always {
+                    // Ensure logout after the job
+                    sh "docker logout"
                 }
             }
         }
+
     }
 }
