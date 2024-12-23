@@ -69,38 +69,35 @@ pipeline {
                             echo "${DOCKER_PASS}" | docker login -u "${DOCKER_USER}" --password-stdin
                         """
 
-                        // Reformat BUILD_TIMESTAMP to valid Docker tag
-                        def sanitizedTimestamp = (env.BUILD_TIMESTAMP ?: "manual")
-                            .replaceAll(' ', '_') // Replace spaces with underscores
-                            .replaceAll(':', '-') // Replace colons with dashes
-                            .replaceAll('[^a-zA-Z0-9_.-]', '') // Remove invalid characters
-                            .toLowerCase() // Convert to lowercase for consistency
-
-                        // Ensure timestamp starts with an alphanumeric character
-                        sanitizedTimestamp = sanitizedTimestamp.replaceAll('^[^a-zA-Z0-9]+', '')
-
+                        echo "Pushing Flask App Image to rall4/myflaskapp..."
                         def appImage = docker.image("${APP_IMAGE}")
-                        appImage.tag("flaskapp-latest")
+                        appImage.tag("rall4/myflaskapp:flaskapp-latest")
                         appImage.push("flaskapp-latest")
-                        appImage.tag("flaskapp-${sanitizedTimestamp}")
-                        appImage.push("flaskapp-${sanitizedTimestamp}")
 
-                        echo "Successfully pushed Flask App image with tags: flaskapp-latest and flaskapp-${sanitizedTimestamp}"
+                        def appTagTimestamp = env.BUILD_TIMESTAMP ?: "manual"
+                        appImage.tag("rall4/myflaskapp:flaskapp-${appTagTimestamp}")
+                        appImage.push("flaskapp-${appTagTimestamp}")
 
+                        echo "Successfully pushed Flask App image with tags: flaskapp-latest and flaskapp-${appTagTimestamp}"
+
+                        echo "Pushing MySQL Image to rall4/myflaskapp..."
                         def mysqlImage = docker.image("${MYSQL_IMAGE}")
-                        mysqlImage.tag("mysql-latest")
+                        mysqlImage.tag("rall4/myflaskapp:mysql-latest")
                         mysqlImage.push("mysql-latest")
-                        mysqlImage.tag("mysql-${sanitizedTimestamp}")
-                        mysqlImage.push("mysql-${sanitizedTimestamp}")
 
-                        echo "Successfully pushed MySQL image with tags: mysql-latest and mysql-${sanitizedTimestamp}"
+                        def mysqlTagTimestamp = env.BUILD_TIMESTAMP ?: "manual"
+                        mysqlImage.tag("rall4/myflaskapp:mysql-${mysqlTagTimestamp}")
+                        mysqlImage.push("mysql-${mysqlTagTimestamp}")
+
+                        echo "Successfully pushed MySQL image with tags: mysql-latest and mysql-${mysqlTagTimestamp}"
                     }
                 }
-            }
 
-            post {
-                always {
-                    sh "docker logout"
+                post {
+                    always {
+                        // Ensure logout after the job
+                        sh "docker logout"
+                    }
                 }
             }
         }
